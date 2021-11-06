@@ -5,7 +5,7 @@ const app = express();
 
 //!USE Request
 app.use(express.static(path.join(__dirname, "public")));
-
+app.use(express.urlencoded({ extended: false }));
 //!LISTEN
 app.listen(5000, () => {
   console.log("Server is running on port 5000");
@@ -94,5 +94,18 @@ app.get("/search", (req, res) => {
 });
 
 //POST Request
+app.post("/add_product", (req, res) => {
+  const { name, price } = req.body;
+  if (!name || !price) {
+    return res.status(400).send("Missing name or price");
+  }
+  const newProduct = {
+    id: products.length + 1,
+    name,
+    price,
+  };
+  products.push(newProduct);
+  res.status(201).json(newProduct);
+});
 //PUT Request
 //DELETE Request
