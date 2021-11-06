@@ -11,6 +11,13 @@ app.listen(5000, () => {
   console.log("Server is running on port 5000");
 });
 
+//!ALL Request
+//*Works for all HTTP request types
+app.all("*", (req, res) => {
+  //Handling 404s
+  res.status(404).send("Page Not Found");
+});
+
 //!GET Request
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
@@ -68,11 +75,22 @@ app.get("/get_products/:productID", (req, res) => {
   res.json(prod);
 });
 
-//!ALL Request
-//*Works for all HTTP request types
-app.all("*", (req, res) => {
-  //Handling 404s
-  res.status(404).send("Page Not Found");
+//!Querying and sorting
+app.get("/search", (req, res) => {
+  const { query, limit } = req.query;
+  let curated = [...products];
+  if (query) {
+    curated = curated.filter((product) =>
+      product.name.toLowerCase().includes(query.toLowerCase())
+    );
+  }
+  if (limit) {
+    curated = curated.slice(0, Number(limit));
+  }
+  if (curated.length === 0) {
+    return res.status(204).json({ data: [] });
+  }
+  res.json(curated);
 });
 
 //POST Request
